@@ -18,3 +18,10 @@ install_manifest.txt
 *.lai
 *.la
 *.a
+
+# Tempoorary folders
+c++/*
+py/*
+
+# Binaries
+keyboard

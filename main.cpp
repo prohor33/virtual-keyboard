@@ -1,15 +1,16 @@
 #include "main.h"
 #include "two_dim_manipulator.h"
 #include "osg_stuff.h"
+#include "data_receiver.h"
 
 using namespace std;
 
-osg::Vec2 main_window_size( 800, 500 );
+osg::Vec2 main_window_size(800, 500);
 
 int main (int argc, char **argv) {
 
-  osg::Camera* camera = createHUDCamera( 0, main_window_size.x(),
-                                        0, main_window_size.y() );
+  osg::Camera* camera = createHUDCamera(0, main_window_size.x(),
+                                        0, main_window_size.y());
 
   osg::Group* root = new osg::Group;
   root->addChild(camera);
@@ -21,8 +22,8 @@ int main (int argc, char **argv) {
   viewer.setSceneData(root);
 	viewer.addEventHandler( new PickHandler );
 	viewer.setCameraManipulator( new TwoDimManipulator );
-	viewer.setUpViewInWindow( 50, 50, 50 + main_window_size.x(),
-                           50 + main_window_size.y(), 0 );
+	viewer.setUpViewInWindow(50, 50, 50 + main_window_size.x(),
+                           50 + main_window_size.y(), 0);
 
   // change window title
   viewer.realize();
@@ -33,7 +34,11 @@ int main (int argc, char **argv) {
        window != windows.end(); ++window)
   (*window)->setWindowName("Virtual keyboard");
 
-	viewer.run();
+  DATA_RECEIVER->start();
+
+  viewer.run();
+
+  DATA_RECEIVER->StopWorking();
 
   return 0;
 }
