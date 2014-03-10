@@ -22,15 +22,15 @@ void DataReceiver::run()
       return;
     }
 
-    COORD_PROC->UpdateCoord(osg::Vec2d(coord.x(), coord.y()));
-    cout << "x = " << coord.x() << " y = " << coord.y() << endl;
+    COORD_PROC->UpdateEyeCoord(osg::Vec2d(coord.x(), coord.y()));
+    //cout << "x = " << coord.x() << " y = " << coord.y() << endl;
 
     //  Send reply back to client
     zmq::message_t reply(5);
     memcpy((void *) reply.data (), "World", 5);
     socket.send(reply);
 
-    OpenThreads::Thread::microSleep(1);
+    OpenThreads::Thread::microSleep(10);
   }
 }
 

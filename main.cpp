@@ -2,8 +2,7 @@
 #include "two_dim_manipulator.h"
 #include "osg_stuff.h"
 #include "data_receiver.h"
-
-using namespace std;
+#include "coord_proc.h"
 
 osg::Vec2 main_window_size(800, 500);
 
@@ -35,6 +34,7 @@ int main (int argc, char **argv) {
   (*window)->setWindowName("Virtual keyboard");
 
   DATA_RECEIVER->start();
+  COORD_PROC->StartCalibration();
 
   viewer.run();
 

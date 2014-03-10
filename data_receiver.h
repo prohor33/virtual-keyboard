@@ -26,6 +26,7 @@ protected:
 
   bool m_bDone;
   static DataReceiver* m_pDataReceiver;
+  osg::Vec2d m_vCoord;
 };
 
 #define DATA_RECEIVER DataReceiver::Instance()
