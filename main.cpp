@@ -4,12 +4,16 @@
 #include "data_receiver.h"
 #include "coord_proc.h"
 
-osg::Vec2 main_window_size(800, 500);
+osg::Vec2 window_size(800, 500);
+
+const osg::Vec2d NormalizedToScreen(const osg::Vec2d vec) {
+  return osg::Vec2d(vec.x()*window_size.x(), vec.y()*window_size.y());
+}
 
 int main (int argc, char **argv) {
 
-  osg::Camera* camera = createHUDCamera(0, main_window_size.x(),
-                                        0, main_window_size.y());
+  osg::Camera* camera = createHUDCamera(0, window_size.x(),
+                                        0, window_size.y());
 
   osg::Group* root = new osg::Group;
   root->addChild(camera);
@@ -21,8 +25,8 @@ int main (int argc, char **argv) {
   viewer.setSceneData(root);
 	viewer.addEventHandler( new PickHandler );
 	viewer.setCameraManipulator( new TwoDimManipulator );
-	viewer.setUpViewInWindow(50, 50, 50 + main_window_size.x(),
-                           50 + main_window_size.y(), 0);
+	viewer.setUpViewInWindow(50, 50, 50 + window_size.x(),
+                           50 + window_size.y(), 0);
 
   // change window title
   viewer.realize();
@@ -35,6 +39,9 @@ int main (int argc, char **argv) {
 
   DATA_RECEIVER->start();
   COORD_PROC->StartCalibration();
+  COORD_PROC->root = camera;
+
+  //camera->addChild(DrawProgressPoint(osg::Vec2d(100, 100), 80));
 
   viewer.run();
 

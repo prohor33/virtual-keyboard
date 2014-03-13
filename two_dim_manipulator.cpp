@@ -4,9 +4,10 @@
 */
 
 #include"two_dim_manipulator.h"
+#include <iostream>
 
 TwoDimManipulator::TwoDimManipulator()
-:   _distance(1.0)
+:   _distance(10)
 {
 }
 
@@ -39,7 +40,7 @@ void TwoDimManipulator::setByInverseMatrix( const osg::Matrixd& matrix )
 {
     osg::Vec3d eye, center, up;
     matrix.getLookAt( eye, center, up );
-    
+
     _center = center; _center.z() = 0.0f;
     if ( _node.valid() )
         _distance = abs((_node->getBound().center() - eye).z());
@@ -53,6 +54,8 @@ void TwoDimManipulator::home( double )
     {
         _center = _node->getBound().center(); _center.z() = 0.0f;
         _distance = 2.5 * _node->getBound().radius();
+        std::cout << _distance << " " << _center.x() << "" <<
+          _center.y() << std::endl;
     }
     else
     {

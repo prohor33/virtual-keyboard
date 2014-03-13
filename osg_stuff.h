@@ -48,5 +48,11 @@ protected:
 	}
 };
 
-osg::Camera* createHUDCamera( double left, double right,
-                             double bottom, double top );
+osg::Camera* createHUDCamera(double left, double right,
+                             double bottom, double top);
+
+osg::ref_ptr<osg::Vec3Array> PointVert(int progress,
+    int approx, double radius);
+osg::ref_ptr<osg::Node> DrawProgressPoint(osg::Vec2d coord,
+    int progress);
+

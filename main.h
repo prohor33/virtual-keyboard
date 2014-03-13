@@ -9,6 +9,7 @@
 #include <osg/LineWidth>
 #include <osgViewer/Viewer>
 #include <osgDB/ReadFile>
+#include <osg/MatrixTransform>
 
 #include <iostream>
 #include <stdio.h>
@@ -17,3 +18,5 @@
 #include <time.h>
 
 using namespace std;
+
+const osg::Vec2d NormalizedToScreen(const osg::Vec2d vec);
