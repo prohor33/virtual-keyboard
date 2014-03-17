@@ -1,4 +1,6 @@
 #include "osg_stuff.h"
+#include "manager.h"
+#include "callbacks.h"
 
 osg::Camera* createHUDCamera( double left, double right,
                              double bottom, double top ) {
@@ -16,6 +18,12 @@ osg::Camera* createHUDCamera( double left, double right,
 osg::ref_ptr<osg::Vec3Array>
 PointVert(int progress, int approx, double radius)
 {
+  if (approx < 3)
+    approx = 3;
+  if (radius <= 0)
+    radius = 1e-4;
+  if (approx*progress/100 < 1)
+    progress = 100/approx;
   const double angle( osg::PI * 2. / (double) approx );
   osg::ref_ptr<osg::Vec3Array> v = new osg::Vec3Array;
   int idx;
@@ -57,13 +65,49 @@ DrawProgressPoint(osg::Vec2d coord, int progress)
   c->push_back( osg::Vec4( 1., 0.6, 0.6, 1. ) );
   geom->setColorArray( c );
   geom->setColorBinding( osg::Geometry::BIND_OVERALL );
-  geom->addPrimitiveSet( new osg::DrawArrays( GL_TRIANGLES, 0,
-        (approx*progress/100.0)*3 ) );
-
-  geode->addDrawable( geom );
+  osg::ref_ptr<osg::DrawArrays> points =
+  new osg::DrawArrays( GL_TRIANGLES, 0, (approx*progress/100.0)*3 );
+  points->setDataVariance(osg::Object::DYNAMIC);
+  geom->addPrimitiveSet( points.get() );
+  geom->setUseDisplayList(false);
+  geom->setDataVariance(osg::Object::DYNAMIC);
+  geom->setUpdateCallback(new ProgressPointCallback);
+  geode->addDrawable(geom);
   osg::MatrixTransform *tx = new osg::MatrixTransform();
   tx->setMatrix(osg::Matrix::translate(coord.x(), coord.y(), 0));
+  tx->setDataVariance(osg::Object::DYNAMIC);
   tx->addChild(geode);
 
   return tx;
 }
+
+osg::ref_ptr<osg::Node> DrawDPSText() {
+  osg::ref_ptr<osg::Geode> HUDGeode = new osg::Geode();
+  osg::ref_ptr<osgText::Text> textDPS = new osgText::Text();
+  textDPS->setCharacterSize(20);
+  textDPS->setFont("/System/Library/Fonts/Apple Symbols.ttf");
+  HUDGeode->addDrawable(textDPS);
+  textDPS->setText("DPS: Data not available");
+  textDPS->setAxisAlignment(osgText::Text::SCREEN);
+  textDPS->setPosition( osg::Vec3(10,WND_SZ.y()-50,-1.5) );
+  textDPS->setColor( osg::Vec4(69.0/255.0, 87.0/225.0, 87/255.0, 1) );
+  textDPS->setDataVariance(osg::Object::DYNAMIC);
+  textDPS->setUpdateCallback(new DPSUpdateCallback);
+  return HUDGeode;
+}
+
+osg::ref_ptr<osg::Node> DrawMessageText() {
+  osg::ref_ptr<osg::Geode> HUDGeode = new osg::Geode();
+  osg::ref_ptr<osgText::Text> text = new osgText::Text();
+  text->setCharacterSize(20);
+  text->setFont("/System/Library/Fonts/Apple Symbols.ttf");
+  HUDGeode->addDrawable(text);
+  text->setText("Message: ...");
+  text->setAxisAlignment(osgText::Text::SCREEN);
+  text->setPosition( osg::Vec3(10,WND_SZ.y()-80,-1.5) );
+  text->setColor( osg::Vec4(69.0/255.0, 87.0/225.0, 87/255.0, 1) );
+  text->setDataVariance(osg::Object::DYNAMIC);
+  text->setUpdateCallback(new MessageUpdateCallback);
+  return HUDGeode;
+}
+

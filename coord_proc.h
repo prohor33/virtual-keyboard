@@ -54,42 +54,29 @@ class CoordProcessor {
   const osg::Vec2d& GetEyeCoord() {
     return m_vEyeCoord;
   }
-  void StartCalibration() {
-    m_bCalibration = true;
-    m_bCalibrationFinished = false;
-    m_iCurrentCheckpoint = 0;
-    m_tChangePointTime = time(NULL);
-    cout << "Start calibration." << endl;
-    m_vCheckPoints[m_iCurrentCheckpoint].StartAdding();
+  osg::Vec2d GetNormalizedCoordScr() {
+    if (m_bCalibrationFinished)
+      return NormalizedToScreen(m_vNormalizedCoord);
+    else if (m_bCalibration)
+      return NormalizedToScreen(m_vCheckPoints[m_iCurrentCheckpoint].n_coord);
+    return osg::Vec2d();
   }
-  void EndCalibration() {
-    m_bCalibration = false;
-    m_bCalibrationFinished = true;
-    m_iCurrentCheckpoint = -1;
-    cout << "End calibration." << endl;
-  }
-  void NextCheckPoint() {
-    m_vCheckPoints[m_iCurrentCheckpoint].EndAdding();
-
-    cout << m_vCheckPoints[m_iCurrentCheckpoint].eye_coord.x() <<
-      " " << m_vCheckPoints[m_iCurrentCheckpoint].eye_coord.y() <<
-      endl;
-
-    m_iCurrentCheckpoint++;
-    m_vCheckPoints[m_iCurrentCheckpoint].StartAdding();
-    if (m_iCurrentCheckpoint >= m_vCheckPoints.size()) {
-      EndCalibration();
-      return;
-    }
-    m_tChangePointTime = time(NULL);
-    cout << "Next checkpoint" << endl;
-  }
+  
+  void StartCalibration();
+  void EndCalibration();
+  void NextCheckPoint();
   CheckPoint* GetCurrentCheckPoint() {
     if (!m_bCalibration)
       return NULL;
     return &m_vCheckPoints[m_iCurrentCheckpoint];
   }
-
+  int GetDPS() const {
+    return m_iDPS;
+  }
+  ProgressPoint* GetProgressPoint() {
+    return &m_cProgressPoint;
+  }
+  
   // lets try
   osg::Group* root;
 
@@ -97,15 +84,18 @@ class CoordProcessor {
   CoordProcessor() :
   m_bCalibration(false),
   m_bCalibrationFinished(false),
-  m_iCurrentCheckpoint(-1)
+  m_iCurrentCheckpoint(-1),
+  m_iDPS(0)
   {
     // Initialize checkpoints
     m_vCheckPoints.push_back(osg::Vec2d(0.1, 0.1));
-    //m_vCheckPoints.push_back(osg::Vec2d(0.5, 0.1));
+    m_vCheckPoints.push_back(osg::Vec2d(0.5, 0.1));
     m_vCheckPoints.push_back(osg::Vec2d(0.9, 0.1));
     m_vCheckPoints.push_back(osg::Vec2d(0.9, 0.9));
-    //m_vCheckPoints.push_back(osg::Vec2d(0.5, 0.9));
+    m_vCheckPoints.push_back(osg::Vec2d(0.5, 0.9));
     m_vCheckPoints.push_back(osg::Vec2d(0.1, 0.9));
+    
+    m_tLastDataRecieveTime = osg::Timer::instance()->tick();
   };
   void ProcessCoord();
 
@@ -118,9 +108,12 @@ class CoordProcessor {
   vector<CheckPoint> m_vCheckPoints;
   int m_iCurrentCheckpoint;
 
-  time_t m_tChangePointTime;
+  osg::Timer_t m_tChangePointTime;
+  osg::Timer_t m_tLastDataRecieveTime;
 
   ProgressPoint m_cProgressPoint;
+  
+  int m_iDPS;
 };
 
 #define COORD_PROC CoordProcessor::Instance()

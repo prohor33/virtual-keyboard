@@ -10,6 +10,7 @@
 #include <osgViewer/Viewer>
 #include <osgDB/ReadFile>
 #include <osg/MatrixTransform>
+#include <osgText/Text>
 
 #include <iostream>
 #include <stdio.h>

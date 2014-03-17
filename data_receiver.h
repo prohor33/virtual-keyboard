@@ -6,8 +6,6 @@
 #include "coord.pb.h"
 #include "coord_proc.h"
 
-using namespace std;
-
 class DataReceiver : public OpenThreads::Thread
 {
 public:

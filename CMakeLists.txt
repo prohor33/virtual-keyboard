@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 2.6)
   FIND_PACKAGE(osgDB)
   FIND_PACKAGE(osgViewer)
   FIND_PACKAGE(osgGA)
+  FIND_PACKAGE(osgText)
 
   SET(SOURCES
           button.cpp
@@ -21,6 +22,8 @@ cmake_minimum_required(VERSION 2.6)
           main.cpp
           osg_stuff.cpp
           two_dim_manipulator.cpp
+          manager.cpp
+          callbacks.cpp
           )
 
   INCLUDE_DIRECTORIES(${ZEROMQ_INCLUDE_DIRS}
@@ -39,4 +42,5 @@ cmake_minimum_required(VERSION 2.6)
                         ${OSGDB_LIBRARY}
                         ${OSGVIEWER_LIBRARY}
                         ${OPENTHREADS_LIBRARY}
-                        ${OSGGA_LIBRARY})
+                        ${OSGGA_LIBRARY}
+                        ${OSGTEXT_LIBRARY})

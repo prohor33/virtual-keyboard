@@ -22,6 +22,7 @@ void DataReceiver::run()
       return;
     }
 
+//    COORD_PROC->UpdateEyeCoord(osg::Vec2d(0.5, 0.5));
     COORD_PROC->UpdateEyeCoord(osg::Vec2d(coord.x(), coord.y()));
     //cout << "x = " << coord.x() << " y = " << coord.y() << endl;
 
@@ -30,7 +31,7 @@ void DataReceiver::run()
     memcpy((void *) reply.data (), "World", 5);
     socket.send(reply);
 
-    OpenThreads::Thread::microSleep(10);
+//    OpenThreads::Thread::microSleep(50);
   }
 }
 

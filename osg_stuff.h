@@ -1,6 +1,7 @@
 #pragma once
 
 #include "main.h"
+#include "coord_proc.h"
 
 class PickHandler : public osgGA::GUIEventHandler
 {
@@ -31,6 +32,9 @@ public:
           break;
 	  		case 'o':
 				  break;
+        case 's':
+            COORD_PROC->StartCalibration();
+          break;
 				}
 				return false;
 			}
@@ -55,4 +59,8 @@ osg::ref_ptr<osg::Vec3Array> PointVert(int progress,
     int approx, double radius);
 osg::ref_ptr<osg::Node> DrawProgressPoint(osg::Vec2d coord,
     int progress);
+osg::ref_ptr<osg::Node> DrawDPSText();
+osg::ref_ptr<osg::Node> DrawMessageText();
+
+
 

@@ -3,17 +3,16 @@
 #include "osg_stuff.h"
 #include "data_receiver.h"
 #include "coord_proc.h"
-
-osg::Vec2 window_size(800, 500);
+#include "manager.h"
 
 const osg::Vec2d NormalizedToScreen(const osg::Vec2d vec) {
-  return osg::Vec2d(vec.x()*window_size.x(), vec.y()*window_size.y());
+  return osg::Vec2d(vec.x()*WND_SZ.x(), vec.y()*WND_SZ.y());
 }
 
 int main (int argc, char **argv) {
 
-  osg::Camera* camera = createHUDCamera(0, window_size.x(),
-                                        0, window_size.y());
+  osg::Camera* camera = createHUDCamera(0, WND_SZ.x(),
+                                        0, WND_SZ.y());
 
   osg::Group* root = new osg::Group;
   root->addChild(camera);
@@ -23,10 +22,11 @@ int main (int argc, char **argv) {
   viewer.getCamera()->setClearColor(
       osg::Vec4(0.8f, 0.9f, 0.7f, 1.0f));
   viewer.setSceneData(root);
+  viewer.addEventHandler( new osgViewer::StatsHandler );
 	viewer.addEventHandler( new PickHandler );
 	viewer.setCameraManipulator( new TwoDimManipulator );
-	viewer.setUpViewInWindow(50, 50, 50 + window_size.x(),
-                           50 + window_size.y(), 0);
+	viewer.setUpViewInWindow(50, 50, 50 + WND_SZ.x(),
+                           50 + WND_SZ.y(), 0);
 
   // change window title
   viewer.realize();
@@ -41,8 +41,10 @@ int main (int argc, char **argv) {
   COORD_PROC->StartCalibration();
   COORD_PROC->root = camera;
 
-  //camera->addChild(DrawProgressPoint(osg::Vec2d(100, 100), 80));
-
+  camera->addChild(DrawDPSText());
+  camera->addChild(DrawMessageText());
+  camera->addChild(DrawProgressPoint(osg::Vec2d(100, 100), 50));
+  
   viewer.run();
 
   DATA_RECEIVER->StopWorking();
