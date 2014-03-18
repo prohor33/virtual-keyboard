@@ -76,9 +76,6 @@ class CoordProcessor {
   ProgressPoint* GetProgressPoint() {
     return &m_cProgressPoint;
   }
-  
-  // lets try
-  osg::Group* root;
 
  protected:
   CoordProcessor() :

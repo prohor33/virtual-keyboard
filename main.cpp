@@ -4,6 +4,7 @@
 #include "data_receiver.h"
 #include "coord_proc.h"
 #include "manager.h"
+#include "keyboard.h"
 
 const osg::Vec2d NormalizedToScreen(const osg::Vec2d vec) {
   return osg::Vec2d(vec.x()*WND_SZ.x(), vec.y()*WND_SZ.y());
@@ -39,11 +40,15 @@ int main (int argc, char **argv) {
 
   DATA_RECEIVER->start();
   COORD_PROC->StartCalibration();
-  COORD_PROC->root = camera;
 
   camera->addChild(DrawDPSText());
   camera->addChild(DrawMessageText());
   camera->addChild(DrawProgressPoint(osg::Vec2d(100, 100), 50));
+  
+  osg::ref_ptr<osg::Group> gKeyboard = new osg::Group;
+  root->addChild(gKeyboard);
+  KEYBOARD->SetRoot(gKeyboard);
+  KEYBOARD->Draw();
   
   viewer.run();
 

@@ -111,3 +111,72 @@ osg::ref_ptr<osg::Node> DrawMessageText() {
   return HUDGeode;
 }
 
+osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d size) {
+  osg::ref_ptr<osg::Geode> HUDGeode = new osg::Geode();
+  // Set up geometry for the HUD and add it to the HUD
+  osg::Geometry* HUDBackgroundGeometry = new osg::Geometry();
+  
+  osg::Vec3Array* HUDBackgroundVertices = new osg::Vec3Array;
+  HUDBackgroundVertices->push_back( osg::Vec3( 0,    0,-1) );
+  HUDBackgroundVertices->push_back( osg::Vec3(50,  0,-1) );
+  HUDBackgroundVertices->push_back( osg::Vec3(50,50,-1) );
+  HUDBackgroundVertices->push_back( osg::Vec3(   0,50,-1) );
+  
+  osg::DrawElementsUInt* HUDBackgroundIndices =
+  new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON, 0);
+  HUDBackgroundIndices->push_back(0);
+  HUDBackgroundIndices->push_back(1);
+  HUDBackgroundIndices->push_back(2);
+  HUDBackgroundIndices->push_back(3);
+  
+  osg::Vec4Array* HUDcolors = new osg::Vec4Array;
+  HUDcolors->push_back(osg::Vec4(0.8f,0.8f,0.8f,0.8f));
+  
+  osg::Vec2Array* texcoords = new osg::Vec2Array(4);
+  (*texcoords)[0].set(0.0f,0.0f);
+  (*texcoords)[1].set(1.0f,0.0f);
+  (*texcoords)[2].set(1.0f,1.0f);
+  (*texcoords)[3].set(0.0f,1.0f);
+  
+  HUDBackgroundGeometry->setTexCoordArray(0,texcoords);
+  osg::Texture2D* HUDTexture = new osg::Texture2D;
+  HUDTexture->setDataVariance(osg::Object::DYNAMIC);
+  osg::Image* hudImage;
+  hudImage = osgDB::readImageFile("A.jpg");
+  if (!hudImage) {
+    cout << "can't read image" << endl;
+  }
+  HUDTexture->setImage(hudImage);
+  osg::Vec3Array* HUDnormals = new osg::Vec3Array;
+  HUDnormals->push_back(osg::Vec3(0.0f,0.0f,1.0f));
+  HUDBackgroundGeometry->setNormalArray(HUDnormals);
+  HUDBackgroundGeometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
+  HUDBackgroundGeometry->addPrimitiveSet(HUDBackgroundIndices);
+  HUDBackgroundGeometry->setVertexArray(HUDBackgroundVertices);
+  HUDBackgroundGeometry->setColorArray(HUDcolors);
+  HUDBackgroundGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+  
+  // Create and set up a state set using the texture from above:
+  osg::StateSet* HUDStateSet = new osg::StateSet();
+  HUDGeode->setStateSet(HUDStateSet);
+  HUDStateSet->
+  setTextureAttributeAndModes(0,HUDTexture,osg::StateAttribute::ON);
+  
+  // For this state set, turn blending on (so alpha texture looks right)
+  HUDStateSet->setMode(GL_BLEND,osg::StateAttribute::ON);
+  
+  // Disable depth testing so geometry is draw regardless of depth values
+  // of geometry already draw.
+  HUDStateSet->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
+  HUDStateSet->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
+  
+  // Need to make sure this geometry is draw last. RenderBins are handled
+  // in numerical order so set bin number to 11
+  HUDStateSet->setRenderBinDetails( 11, "RenderBin");
+  
+  HUDGeode->addDrawable(HUDBackgroundGeometry);
+  return HUDGeode;
+}
+
+
+

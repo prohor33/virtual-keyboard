@@ -61,6 +61,10 @@ osg::ref_ptr<osg::Node> DrawProgressPoint(osg::Vec2d coord,
     int progress);
 osg::ref_ptr<osg::Node> DrawDPSText();
 osg::ref_ptr<osg::Node> DrawMessageText();
+osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d size);
+
+
+
 
 
 
