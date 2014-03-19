@@ -62,6 +62,11 @@ osg::ref_ptr<osg::Node> DrawProgressPoint(osg::Vec2d coord,
 osg::ref_ptr<osg::Node> DrawDPSText();
 osg::ref_ptr<osg::Node> DrawMessageText();
 osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d size);
+osg::ref_ptr<osg::Node> DrawInputText();
+osg::ref_ptr<osg::Node> DrawPolygon(osg::Vec2d pos, osg::Vec2d size, osg::Vec4d color);
+
+
+
 
 
 

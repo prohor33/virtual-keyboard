@@ -111,16 +111,33 @@ osg::ref_ptr<osg::Node> DrawMessageText() {
   return HUDGeode;
 }
 
+osg::ref_ptr<osg::Node> DrawInputText() {
+  osg::ref_ptr<osg::Geode> HUDGeode = new osg::Geode();
+  osg::ref_ptr<osgText::Text> text = new osgText::Text();
+  text->setCharacterSize(40);
+  text->setFont("/System/Library/Fonts/LiberationSerif-Regular.ttf");
+  HUDGeode->addDrawable(text);
+  
+  std::wstring wide = std::wstring(L"Русский текст!");
+  text->setText(wide.c_str());
+  text->setAxisAlignment(osgText::Text::SCREEN);
+  text->setPosition( osg::Vec3(320,WND_SZ.y()-83,-1) );
+  text->setColor( osg::Vec4(0.0/255.0, 0.0/225.0, 0.0/255.0, 1) );
+  text->setDataVariance(osg::Object::DYNAMIC);
+  text->setUpdateCallback(new InputTextUpdateCallback);
+  return HUDGeode;
+}
+
 osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d size) {
   osg::ref_ptr<osg::Geode> HUDGeode = new osg::Geode();
   // Set up geometry for the HUD and add it to the HUD
   osg::Geometry* HUDBackgroundGeometry = new osg::Geometry();
   
   osg::Vec3Array* HUDBackgroundVertices = new osg::Vec3Array;
-  HUDBackgroundVertices->push_back( osg::Vec3( 0,    0,-1) );
-  HUDBackgroundVertices->push_back( osg::Vec3(50,  0,-1) );
-  HUDBackgroundVertices->push_back( osg::Vec3(50,50,-1) );
-  HUDBackgroundVertices->push_back( osg::Vec3(   0,50,-1) );
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x(), pos.y(), -1));
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x()+size.x(), pos.y(), -1));
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x()+size.x(), pos.y()+size.y(), -1));
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x(), pos.y()+size.y(), -1));
   
   osg::DrawElementsUInt* HUDBackgroundIndices =
   new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON, 0);
@@ -142,7 +159,7 @@ osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d 
   osg::Texture2D* HUDTexture = new osg::Texture2D;
   HUDTexture->setDataVariance(osg::Object::DYNAMIC);
   osg::Image* hudImage;
-  hudImage = osgDB::readImageFile("A.jpg");
+  hudImage = osgDB::readImageFile(img_name);
   if (!hudImage) {
     cout << "can't read image" << endl;
   }
@@ -178,5 +195,53 @@ osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d 
   return HUDGeode;
 }
 
+
+osg::ref_ptr<osg::Node> DrawPolygon(osg::Vec2d pos, osg::Vec2d size, osg::Vec4d color) {
+  osg::ref_ptr<osg::Geode> HUDGeode = new osg::Geode();
+  // Set up geometry for the HUD and add it to the HUD
+  osg::Geometry* HUDBackgroundGeometry = new osg::Geometry();
+  
+  osg::Vec3Array* HUDBackgroundVertices = new osg::Vec3Array;
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x(), pos.y(), -2));
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x()+size.x(), pos.y(), -2));
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x()+size.x(), pos.y()+size.y(), -2));
+  HUDBackgroundVertices->push_back(osg::Vec3(pos.x(), pos.y()+size.y(), -2));
+  
+  osg::DrawElementsUInt* HUDBackgroundIndices =
+  new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON, 0);
+  HUDBackgroundIndices->push_back(0);
+  HUDBackgroundIndices->push_back(1);
+  HUDBackgroundIndices->push_back(2);
+  HUDBackgroundIndices->push_back(3);
+  
+  osg::Vec4Array* HUDcolors = new osg::Vec4Array;
+  HUDcolors->push_back(color);
+  
+  osg::Vec3Array* HUDnormals = new osg::Vec3Array;
+  HUDnormals->push_back(osg::Vec3(0.0f,0.0f,1.0f));
+  HUDBackgroundGeometry->setNormalArray(HUDnormals);
+  HUDBackgroundGeometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
+  HUDBackgroundGeometry->addPrimitiveSet(HUDBackgroundIndices);
+  HUDBackgroundGeometry->setVertexArray(HUDBackgroundVertices);
+  HUDBackgroundGeometry->setColorArray(HUDcolors);
+  HUDBackgroundGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+
+  osg::StateSet* HUDStateSet = new osg::StateSet();
+  HUDGeode->setStateSet(HUDStateSet);
+  // For this state set, turn blending on (so alpha texture looks right)
+  HUDStateSet->setMode(GL_BLEND,osg::StateAttribute::ON);
+  
+  // Disable depth testing so geometry is draw regardless of depth values
+  // of geometry already draw.
+  HUDStateSet->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
+  HUDStateSet->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
+  
+  // Need to make sure this geometry is draw last. RenderBins are handled
+  // in numerical order so set bin number to 11
+//  HUDStateSet->setRenderBinDetails( 11, "RenderBin");
+  
+  HUDGeode->addDrawable(HUDBackgroundGeometry);
+  return HUDGeode;
+}
 
 

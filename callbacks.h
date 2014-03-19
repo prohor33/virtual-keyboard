@@ -2,6 +2,7 @@
 #include "coord_proc.h"
 #include "osg_stuff.h"
 #include "manager.h"
+#include "keyboard.h"
 
 struct DPSUpdateCallback : public osg::Drawable::UpdateCallback
 {
@@ -21,6 +22,15 @@ struct MessageUpdateCallback : public osg::Drawable::UpdateCallback
     osgText::Text* text = dynamic_cast<osgText::Text*>(drawable);
     string str = MANAGER->GetMessage();
     text->setText("State: " + str);
+  }
+};
+
+struct InputTextUpdateCallback : public osg::Drawable::UpdateCallback
+{
+  virtual void update(osg::NodeVisitor*, osg::Drawable* drawable)
+  {
+    osgText::Text* text = dynamic_cast<osgText::Text*>(drawable);
+    text->setText(KEYBOARD->GetInputText().c_str());
   }
 };
 

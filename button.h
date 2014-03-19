@@ -4,12 +4,20 @@
 
 class Button {
 public:
-  Button() {};
+  Button(osg::Vec2d pos, osg::Vec2d size, wstring symbol, string img_name) :
+  m_vPos(pos),
+  m_vSize(size)
+  {
+    m_vSymbol.push_back(symbol);
+    m_cImgName.push_back(img_name);
+  };
   ~Button() {};
   void Draw(osg::ref_ptr<osg::Group> root);
-
-  osg::Vec2d pos;
-  osg::Vec2d size;
-  vector<string> symbol; // for different localization
-  vector<string> img_name;
+  void Push();
+  
+private:
+  osg::Vec2d m_vPos;
+  osg::Vec2d m_vSize;
+  vector<wstring> m_vSymbol; // for different localization
+  vector<string> m_cImgName;
 };

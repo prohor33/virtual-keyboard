@@ -43,10 +43,13 @@ int main (int argc, char **argv) {
 
   camera->addChild(DrawDPSText());
   camera->addChild(DrawMessageText());
+  camera->addChild(DrawInputText());
   camera->addChild(DrawProgressPoint(osg::Vec2d(100, 100), 50));
+  camera->addChild(DrawPolygon(osg::Vec2d(300, WND_SZ.y()-100), osg::Vec2d(600, 60), osg::Vec4d(1.0, 1.0, 1.0, 1.0)));
   
   osg::ref_ptr<osg::Group> gKeyboard = new osg::Group;
   root->addChild(gKeyboard);
+  KEYBOARD->Initialize();
   KEYBOARD->SetRoot(gKeyboard);
   KEYBOARD->Draw();
   
