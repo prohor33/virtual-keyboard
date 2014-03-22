@@ -63,12 +63,15 @@ void CoordProcessor::UpdateEyeCoord(const osg::Vec2d& x) {
 
   if (m_bCalibrationFinished)
     ProcessCoord();
+  
+  if (m_bCalibrationFinished)
+    UpdateSelector();
 }
 
 void CoordProcessor::CheckCalibration() {
   double dt =  osg::Timer::instance()->delta_s(m_tChangePointTime,
                                                osg::Timer::instance()->tick());
-  double max_time = 8.0;
+  double max_time = CHECKPOINT_TIME_S;
   
   if (dt > max_time) {
     NextCheckPoint();
@@ -125,3 +128,9 @@ void CoordProcessor::ProcessCoord() {
   double y_coef = (p.y() - down_y)/(up_y - down_y);
   m_vNormalizedCoord = p_down_n + (p_up_n - p_down_n)*y_coef;
 }
+
+void CoordProcessor::UpdateSelector() {
+  SelectObject(m_vNormalizedCoord.x(), m_vNormalizedCoord.y(), MANAGER->GetViewer());
+}
+
+

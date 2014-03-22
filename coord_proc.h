@@ -46,6 +46,7 @@ class CoordProcessor {
     return m_pCoordProcessor;
   }
   void UpdateEyeCoord(const osg::Vec2d&);
+  void UpdateSelector();
   void CheckCalibration();
 
   const osg::Vec2d& GetNormalizedCoord() {

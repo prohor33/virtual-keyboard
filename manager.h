@@ -21,15 +21,23 @@ public:
   void SetMessage(const string& msg) {
     m_sMessage = msg;
   }
-protected:
+  void SetViewer(osgViewer::Viewer* viewer) {
+    m_pViewer = viewer;
+  }
+  osgViewer::Viewer* GetViewer() {
+    return m_pViewer;
+  }
+private:
   Manager() :
 //  m_vWindowSize(800, 500)
-  m_vWindowSize(1440, 900)
+  m_vWindowSize(1440, 900),
+  m_pViewer(NULL)
   {}
   
   static Manager* m_pManager;
   osg::Vec2d m_vWindowSize;
   string m_sMessage;
+  osgViewer::Viewer* m_pViewer;
 };
 
 #define MANAGER Manager::Instance()

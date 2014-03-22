@@ -38,9 +38,6 @@ int main (int argc, char **argv) {
        window != windows.end(); ++window)
   (*window)->setWindowName("Virtual keyboard");
 
-  DATA_RECEIVER->start();
-  COORD_PROC->StartCalibration();
-
   camera->addChild(DrawDPSText());
   camera->addChild(DrawMessageText());
   camera->addChild(DrawInputText());
@@ -52,6 +49,11 @@ int main (int argc, char **argv) {
   KEYBOARD->Initialize();
   KEYBOARD->SetRoot(gKeyboard);
   KEYBOARD->Draw();
+  
+  MANAGER->SetViewer(&viewer);
+  
+  DATA_RECEIVER->start();
+  COORD_PROC->StartCalibration();
   
   viewer.run();
 

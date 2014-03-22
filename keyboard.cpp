@@ -1,15 +1,26 @@
 #include "keyboard.h"
 #include "button.h"
 
-void Keyboard::AddButton(wstring symbol, osg::Vec2d pos,
+void Keyboard::AddButton(string name, wstring symbol, osg::Vec2d pos,
                          osg::Vec2d size, string img_name) {
-  Button* btn = new Button(pos, size, symbol, img_name);
-  btn->Push();
-  m_vButtons.push_back(std::shared_ptr<Button>(btn));
+  Button* btn = new Button(name, pos, size, symbol, img_name);
+  m_mButtons[name] = std::shared_ptr<Button>(btn);
 }
 
 void Keyboard::Draw() {
-  for (vector<shared_ptr<Button> >::iterator it=m_vButtons.begin(); it!=m_vButtons.end(); ++it) {
-    (*it)->Draw(m_gRoot);
+  for (map<string, shared_ptr<Button> >::iterator it=m_mButtons.begin(); it!=m_mButtons.end(); ++it) {
+    (*it).second->Draw(m_gRoot);
   }
+}
+
+void Keyboard::SelectButton(string name) {
+  for (map<string, shared_ptr<Button> >::iterator it=m_mButtons.begin(); it!=m_mButtons.end(); ++it) {
+    (*it).second->Unselect();
+  }
+  if (m_mButtons.find(name) != m_mButtons.end())
+    m_mButtons[name]->Select();
+}
+void Keyboard::PushButton(string name) {
+  if (m_mButtons.find(name) != m_mButtons.end())
+    m_mButtons[name]->Push();
 }

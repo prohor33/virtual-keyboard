@@ -1,6 +1,7 @@
 #include "osg_stuff.h"
 #include "manager.h"
 #include "callbacks.h"
+#include "keyboard.h"
 
 osg::Camera* createHUDCamera( double left, double right,
                              double bottom, double top ) {
@@ -128,7 +129,7 @@ osg::ref_ptr<osg::Node> DrawInputText() {
   return HUDGeode;
 }
 
-osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d size) {
+osg::ref_ptr<osg::Node> DrawTexture(string name, string img_name, osg::Vec2d pos, osg::Vec2d size) {
   osg::ref_ptr<osg::Geode> HUDGeode = new osg::Geode();
   // Set up geometry for the HUD and add it to the HUD
   osg::Geometry* HUDBackgroundGeometry = new osg::Geometry();
@@ -192,6 +193,7 @@ osg::ref_ptr<osg::Node> DrawTexture(string img_name, osg::Vec2d pos, osg::Vec2d 
   HUDStateSet->setRenderBinDetails( 11, "RenderBin");
   
   HUDGeode->addDrawable(HUDBackgroundGeometry);
+  HUDGeode->setName(name);
   return HUDGeode;
 }
 
@@ -242,6 +244,109 @@ osg::ref_ptr<osg::Node> DrawPolygon(osg::Vec2d pos, osg::Vec2d size, osg::Vec4d 
   
   HUDGeode->addDrawable(HUDBackgroundGeometry);
   return HUDGeode;
+}
+
+
+bool PickHandler::handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa)
+{
+  switch(ea.getEventType())
+  {
+    case(osgGA::GUIEventAdapter::PUSH):
+    {
+      osgViewer::View* view = dynamic_cast<osgViewer::View*>(&aa);
+      if (view) pick(view,ea);
+      return false;
+    }
+    case(osgGA::GUIEventAdapter::KEYDOWN):
+    {
+      switch( ea.getKey() ) {
+        case osgGA::GUIEventAdapter::KEY_Down:
+          break;
+      	case 'o':
+      	  break;
+        case 's':
+          COORD_PROC->StartCalibration();
+        break;
+  		}
+      return false;
+    }
+    default:
+      return false;
+  }
+}
+
+void PickHandler::pick(osgViewer::View* view, const osgGA::GUIEventAdapter& ea)
+{
+  SelectObject(ea.getXnormalized(), ea.getYnormalized(), dynamic_cast<osgViewer::Viewer*>(view));
+  return;
+  
+  osgUtil::LineSegmentIntersector::Intersections intersections;
+  
+  std::string gdlist="";
+  
+  if (view->computeIntersections(ea,intersections))
+  {
+    for(osgUtil::LineSegmentIntersector::Intersections::iterator hitr = intersections.begin();
+        hitr != intersections.end();
+        ++hitr)
+    {
+      std::ostringstream os;
+      if (!hitr->nodePath.empty() && !(hitr->nodePath.back()->getName().empty()))
+      {
+        // the geodes are identified by name.
+        os<<"Object \""<<hitr->nodePath.back()->getName()<<"\""<<std::endl;
+        KEYBOARD->PushButton(hitr->nodePath.back()->getName());
+      }
+      else if (hitr->drawable.valid())
+      {
+        os<<"Object \""<<hitr->drawable->className()<<"\""<<std::endl;
+      }
+      
+      os<<"        local coords vertex("<< hitr->getLocalIntersectPoint()<<")"<<"  normal("<<hitr->getLocalIntersectNormal()<<")"<<std::endl;
+      os<<"        world coords vertex("<< hitr->getWorldIntersectPoint()<<")"<<"  normal("<<hitr->getWorldIntersectNormal()<<")"<<std::endl;
+      const osgUtil::LineSegmentIntersector::Intersection::IndexList& vil = hitr->indexList;
+      for(unsigned int i=0;i<vil.size();++i)
+      {
+        os<<"        vertex indices ["<<i<<"] = "<<vil[i]<<std::endl;
+      }
+      
+      gdlist += os.str();
+    }
+  }
+  setLabel(gdlist);
+}
+
+
+bool SelectObject(const double x, const double y,
+          osgViewer::Viewer* viewer)
+{
+  if (!viewer || !viewer->getSceneData()) {
+    cout << "Nothing to pick." << endl;
+    return( false );
+  }
+  
+  double w( .005 ), h( .005 );
+  osgUtil::PolytopeIntersector* picker =
+  new osgUtil::PolytopeIntersector(
+                                   osgUtil::Intersector::PROJECTION,
+                                   x-w, y-h, x+w, y+h );
+  
+  osgUtil::IntersectionVisitor iv( picker );
+  viewer->getCamera()->accept( iv );
+  
+  if (picker->containsIntersections())
+  {
+    const osg::NodePath& nodePath =
+    picker->getFirstIntersection().nodePath;
+    
+    if (!nodePath.empty() && !(nodePath.back()->getName().empty()))
+    {
+      // the geodes are identified by name.
+      cout << "Object \"" << nodePath.back()->getName() << "\""<< endl;
+      KEYBOARD->SelectButton(nodePath.back()->getName());
+    }
+  }
+  return true;
 }
 
 

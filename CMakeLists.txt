@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 2.6)
   FIND_PACKAGE(osgViewer)
   FIND_PACKAGE(osgGA)
   FIND_PACKAGE(osgText)
+  FIND_PACKAGE(osgUtil)
 
   SET(SOURCES
           button.cpp
@@ -43,4 +44,5 @@ cmake_minimum_required(VERSION 2.6)
                         ${OSGVIEWER_LIBRARY}
                         ${OPENTHREADS_LIBRARY}
                         ${OSGGA_LIBRARY}
-                        ${OSGTEXT_LIBRARY})
+                        ${OSGTEXT_LIBRARY}
+                        ${OSGUTIL_LIBRARY})
